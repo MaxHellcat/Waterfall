@@ -102,12 +102,8 @@ class CollectionViewController: UICollectionViewController, UICollectionViewDele
 			// If we've pulled refresh, remove all data and cells first
 			if weakSelf.refreshControl.isRefreshing
 			{
-				var indexPaths = Array<IndexPath>()
-
-				for index in 0..<weakSelf.items.count
-				{
-					let indexPath = IndexPath(item: index, section: 0)
-					indexPaths.append(indexPath)
+				let indexPaths = (0..<weakSelf.items.count).map() {
+					return IndexPath(item: $0, section: 0)
 				}
 
 				weakSelf.items = []
@@ -125,15 +121,11 @@ class CollectionViewController: UICollectionViewController, UICollectionViewDele
 
 			weakSelf.items += items
 
-			var indexPaths = Array<IndexPath>()
-
-			for index in 0..<items.count
-			{
-				let indexPath = IndexPath(item: weakSelf.items.count - items.count + index, section: 0)
-				indexPaths.append(indexPath)
+			let indexPaths = (0..<items.count).map() {
+				return IndexPath(item: weakSelf.items.count - items.count + $0, section: 0)
 			}
 
-			weakSelf.collectionView?.insertItems(at: indexPaths)
+			weakSelf.collectionView!.insertItems(at: indexPaths)
 		}
 	}
 

@@ -37,8 +37,6 @@ class CollectionViewLayout: UICollectionViewLayout
 	// I conider this to be out of scope for this app
 	override func prepare()
 	{
-		print("Layout.Prepare called, width: \(collectionView!.bounds.width)")
-
 		guard let collectionView = collectionView else { return }
 
 		if !attributesCache.isEmpty {

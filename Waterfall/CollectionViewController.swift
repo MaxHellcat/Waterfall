@@ -52,7 +52,7 @@ class CollectionViewController: UICollectionViewController, UICollectionViewDele
 
 		cell.imageView.image = nil
 
-		networkManager.fetchImage(url: item.imageUrl) { (image) in
+		networkManager.fetchImage(url: item.imageUrl) { image in
 			cell.imageView.image = image
 		}
 
@@ -98,8 +98,21 @@ class CollectionViewController: UICollectionViewController, UICollectionViewDele
 		networkManager.fetchNextPage() { [weak self] items in
 
 			guard let weakSelf = self else { return }
-			
-			if weakSelf.refreshControl.isRefreshing {
+
+			// If we've pulled refresh, remove all data and cells first
+			if weakSelf.refreshControl.isRefreshing
+			{
+				var indexPaths = Array<IndexPath>()
+
+				for index in 0..<weakSelf.items.count
+				{
+					let indexPath = IndexPath(item: index, section: 0)
+					indexPaths.append(indexPath)
+				}
+
+				weakSelf.items = []
+				weakSelf.collectionView!.deleteItems(at: indexPaths)
+
 				weakSelf.refreshControl.endRefreshing()
 			}
 
@@ -110,7 +123,7 @@ class CollectionViewController: UICollectionViewController, UICollectionViewDele
 				return
 			}
 
-			weakSelf.items = (weakSelf.items.count == 0 ? items : weakSelf.items + items)
+			weakSelf.items += items
 
 			var indexPaths = Array<IndexPath>()
 

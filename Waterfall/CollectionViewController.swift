@@ -2,93 +2,156 @@
 //  CollectionViewController.swift
 //  Waterfall
 //
-//  Created by Max Reshetey on 20/12/2017.
+//  Created by Max Reshetey on 22/12/2017.
 //  Copyright © 2017 Max Reshetey. All rights reserved.
 //
 
 import UIKit
 
-private let reuseIdentifier = "Cell"
+// Note, this app doesn't use newest prefetch techniques for collection view
+class CollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout, LayoutDelegate
+{
+	@IBOutlet var stepperView: UIStepper!
+	@IBOutlet var paneView: PaneView!
+	var refreshControl: UIRefreshControl!
 
-class CollectionViewController: UICollectionViewController {
+	let networkManager = NetworkManager()
 
-    override func viewDidLoad() {
+	var items = Array<Item>()
+
+	var layout: CollectionViewLayout {
+		return collectionView!.collectionViewLayout as! CollectionViewLayout
+	}
+
+	// MARK: - View lifecycle
+	override func viewDidLoad()
+	{
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
+		layout.delegate = self
 
-        // Register cell classes
-        self.collectionView!.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+		configureStepperView()
+		configureRefreshControl()
 
-        // Do any additional setup after loading the view.
+		fetchNextPage()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+    // MARK: - UICollectionViewDataSource related
+	override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int
+	{
+		return items.count
+	}
 
-    /*
-    // MARK: - Navigation
+	// Note that in real projects we must be able to cancel request for cells that go away,
+	// to avoid flickering and save traffic.
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
+	{
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! CollectionViewCell
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
+		let item = items[indexPath.item]
 
-    // MARK: UICollectionViewDataSource
+		cell.imageView.image = nil
 
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
+		networkManager.fetchImage(url: item.imageUrl) { (image) in
+			cell.imageView.image = image
+		}
 
+		// Of course some other loading decision can be used, using classic approach here
+		if indexPath.item == self.items.count - networkManager.pageSize/2 {
+			fetchNextPage()
+		}
 
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of items
-        return 0
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
-    
-        // Configure the cell
-    
         return cell
     }
 
-    // MARK: UICollectionViewDelegate
+	// MARK: - LayoutDelegate related
+	func heightForItem(at indexPath: IndexPath, itemWidth width: CGFloat) -> CGFloat
+	{
+		return width / CGFloat(items[indexPath.item].ratio)
+	}
 
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
+	func numberOfColumns() -> Int
+	{
+		return Int(stepperView.value)
+	}
 
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
+	// MARK: - Actions handlers
+	@IBAction func stepperValueChanged(_ sender: UIStepper)
+	{
+		layout.invalidateLayout()
+	}
 
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        return false
-    }
+	@objc
+	func refreshTriggered(sender: UIRefreshControl)
+	{
+		networkManager.resetPageCounter()
+		fetchNextPage()
+	}
 
-    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
+	// MARK: - Private methods
+	fileprivate func fetchNextPage()
+	{
+		if networkManager.isInitialPage() {
+			paneView.showIndicatorInSuperview(superview: self.view)
+		}
 
-    override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
-    
-    }
-    */
+		networkManager.fetchNextPage() { [weak self] items in
 
+			guard let weakSelf = self else { return }
+			
+			if weakSelf.refreshControl.isRefreshing {
+				weakSelf.refreshControl.endRefreshing()
+			}
+
+			weakSelf.paneView.dismiss()
+
+			guard let items = items else {
+				weakSelf.paneView.showText(text: "Fetch failed.", superview: weakSelf.view)
+				return
+			}
+
+			weakSelf.items = (weakSelf.items.count == 0 ? items : weakSelf.items + items)
+
+			var indexPaths = Array<IndexPath>()
+
+			for index in 0..<items.count
+			{
+				let indexPath = IndexPath(item: weakSelf.items.count - items.count + index, section: 0)
+				indexPaths.append(indexPath)
+			}
+
+			weakSelf.collectionView?.insertItems(at: indexPaths)
+		}
+	}
+
+	fileprivate func configureStepperView()
+	{
+		self.view.addSubview(stepperView)
+
+		stepperView.layer.cornerRadius = 4.0
+
+		stepperView.translatesAutoresizingMaskIntoConstraints = false
+
+		let centerX = NSLayoutConstraint(item: stepperView, attribute: .centerX, relatedBy: .equal, toItem: self.view, attribute: .centerX, multiplier: 1.0, constant: 0.0)
+
+		let centerY = NSLayoutConstraint(item: self.view, attribute: .bottom, relatedBy: .equal, toItem: stepperView, attribute: .bottom, multiplier: 1.0, constant: 20.0)
+
+		self.view.addConstraints([centerX, centerY])
+	}
+
+	fileprivate func configureRefreshControl()
+	{
+		let refreshControl = UIRefreshControl()
+		refreshControl.addTarget(self, action: #selector(refreshTriggered(sender:)), for: .valueChanged)
+		self.collectionView!.addSubview(refreshControl)
+
+		self.refreshControl = refreshControl
+	}
+
+	// MARK: - Memory management
+	override func didReceiveMemoryWarning()
+	{
+		super.didReceiveMemoryWarning()
+		// Dispose of any resources that can be recreated.
+	}
 }

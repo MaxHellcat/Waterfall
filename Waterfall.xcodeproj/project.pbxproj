@@ -8,11 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		AE08209B1FEA945800096A20 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE08209A1FEA945800096A20 /* AppDelegate.swift */; };
-		AE08209D1FEA945800096A20 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE08209C1FEA945800096A20 /* ViewController.swift */; };
 		AE0820A01FEA945800096A20 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AE08209E1FEA945800096A20 /* Main.storyboard */; };
 		AE0820A21FEA945800096A20 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AE0820A11FEA945800096A20 /* Assets.xcassets */; };
 		AE0820A51FEA945800096A20 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AE0820A31FEA945800096A20 /* LaunchScreen.storyboard */; };
 		AE0820B01FEA945800096A20 /* WaterfallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0820AF1FEA945800096A20 /* WaterfallTests.swift */; };
+		AE0820BB1FEA94F200096A20 /* CollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0820BA1FEA94F200096A20 /* CollectionViewController.swift */; };
+		AE0820BF1FEAA1FE00096A20 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0820BE1FEAA1FE00096A20 /* NetworkManager.swift */; };
+		AE0820C11FEAA72F00096A20 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0820C01FEAA72F00096A20 /* Item.swift */; };
+		AE0820C31FEAB56800096A20 /* CollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0820C21FEAB56800096A20 /* CollectionViewCell.swift */; };
+		AE0820C61FEAF41100096A20 /* CollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE0820C51FEAF41100096A20 /* CollectionViewLayout.swift */; };
+		AE9D23B71FED5478009C0054 /* PaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE9D23B61FED5478009C0054 /* PaneView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,7 +33,6 @@
 /* Begin PBXFileReference section */
 		AE0820971FEA945800096A20 /* Waterfall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Waterfall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE08209A1FEA945800096A20 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		AE08209C1FEA945800096A20 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		AE08209F1FEA945800096A20 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		AE0820A11FEA945800096A20 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AE0820A41FEA945800096A20 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -36,6 +40,12 @@
 		AE0820AB1FEA945800096A20 /* WaterfallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WaterfallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE0820AF1FEA945800096A20 /* WaterfallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterfallTests.swift; sourceTree = "<group>"; };
 		AE0820B11FEA945800096A20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AE0820BA1FEA94F200096A20 /* CollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewController.swift; sourceTree = "<group>"; };
+		AE0820BE1FEAA1FE00096A20 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		AE0820C01FEAA72F00096A20 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		AE0820C21FEAB56800096A20 /* CollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewCell.swift; sourceTree = "<group>"; };
+		AE0820C51FEAF41100096A20 /* CollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewLayout.swift; sourceTree = "<group>"; };
+		AE9D23B61FED5478009C0054 /* PaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,8 +87,13 @@
 		AE0820991FEA945800096A20 /* Waterfall */ = {
 			isa = PBXGroup;
 			children = (
+				AE0820BE1FEAA1FE00096A20 /* NetworkManager.swift */,
+				AE0820C01FEAA72F00096A20 /* Item.swift */,
 				AE08209A1FEA945800096A20 /* AppDelegate.swift */,
-				AE08209C1FEA945800096A20 /* ViewController.swift */,
+				AE0820BA1FEA94F200096A20 /* CollectionViewController.swift */,
+				AE0820C51FEAF41100096A20 /* CollectionViewLayout.swift */,
+				AE0820C21FEAB56800096A20 /* CollectionViewCell.swift */,
+				AE9D23B61FED5478009C0054 /* PaneView.swift */,
 				AE08209E1FEA945800096A20 /* Main.storyboard */,
 				AE0820A11FEA945800096A20 /* Assets.xcassets */,
 				AE0820A31FEA945800096A20 /* LaunchScreen.storyboard */,
@@ -199,7 +214,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AE08209D1FEA945800096A20 /* ViewController.swift in Sources */,
+				AE9D23B71FED5478009C0054 /* PaneView.swift in Sources */,
+				AE0820C61FEAF41100096A20 /* CollectionViewLayout.swift in Sources */,
+				AE0820C31FEAB56800096A20 /* CollectionViewCell.swift in Sources */,
+				AE0820C11FEAA72F00096A20 /* Item.swift in Sources */,
+				AE0820BF1FEAA1FE00096A20 /* NetworkManager.swift in Sources */,
+				AE0820BB1FEA94F200096A20 /* CollectionViewController.swift in Sources */,
 				AE08209B1FEA945800096A20 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -355,6 +375,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Waterfall/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = SimSam.Waterfall;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -369,6 +390,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Waterfall/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = SimSam.Waterfall;
 				PRODUCT_NAME = "$(TARGET_NAME)";

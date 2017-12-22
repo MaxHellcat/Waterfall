@@ -2,73 +2,94 @@
 //  CollectionViewLayout.swift
 //  Waterfall
 //
-//  Created by Max Reshetey on 20/12/2017.
+//  Created by Max Reshetey on 22/12/2017.
 //  Copyright © 2017 Max Reshetey. All rights reserved.
 //
 
 import UIKit
 
-protocol CollectionViewLayout
+protocol LayoutDelegate: class
+{
+	func heightForItem(at indexPath: IndexPath, itemWidth width: CGFloat) -> CGFloat
+	func numberOfColumns() -> Int
+}
 
+// Own implementation of a pinterest-like layout
 class CollectionViewLayout: UICollectionViewLayout
 {
-	func prepare()
-	{
-		
-		
-	}
-	
-	
-//	override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]?
-//	{
-//		let attributes = super.layoutAttributesForElements(in: rect)!
-//
-//		guard attributes.count > 0 else { return attributes }
-//
-//		let attributesCopy = attributes.map { $0.copy() } as! [UICollectionViewLayoutAttributes]
-//
-//		// First row to top
-//		let item = attributesCopy[1]
-//		item.frame.origin.y = 0
-//		let prevItem = attributesCopy[0]
-//		prevItem.frame.origin.y = 0
-//
-//		guard attributes.count > 1 else { return attributes }
-//
-//		for i in 2..<attributesCopy.count
-//		{
-//			let item = attributesCopy[i]
-//			let prevPrevItem = attributesCopy[i-2]
-//
-//			print("Item \(i) center \(item.center)")
-//			print("Item \(i-2) center \(prevPrevItem.center)")
-//			print()
-//
-//			item.frame.origin.y = prevPrevItem.frame.maxY + 8.0
-//		}
-//
-//		let lastItem = attributesCopy[attributesCopy.count-1]
-//
-////		contentSize = CGSize(width: 0, height: 0)
-////
-////		contentSize!.height = lastItem.frame.maxY + 8.0
-////		contentSize!.width = collectionView!.bounds.width
-//
-//		print("See attr count: \(attributesCopy.count)")
-//
-//		return attributesCopy
-//	}
+	let itemSpacing: CGFloat = 8.0
 
-//	override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes?
-//	{
-//		let attributes = super.layoutAttributesForItem(at: indexPath)!
-//
-//		let attributesCopy = attributes.copy() as! UICollectionViewLayoutAttributes
-//
-//		print("See attr")
-//
-//		attributesCopy.center.x += 2
-//
-//		return attributesCopy
-//	}
+	weak var delegate: LayoutDelegate!
+
+	var attributesCache = [UICollectionViewLayoutAttributes]()
+
+	var contentWidth: CGFloat {
+		guard let collectionView = collectionView else { return 0.0 }
+		return collectionView.bounds.width
+	}
+	var contentHeight: CGFloat = 0.0
+
+	override var collectionViewContentSize: CGSize {
+		return CGSize(width: contentWidth, height: contentHeight)
+	}
+
+	// TODO: We don't need to recalculate cached values if we're here after new items' insertion, but
+	// I conider this to be out of scope for this app
+	override func prepare()
+	{
+		print("Layout.Prepare called, width: \(collectionView!.bounds.width)")
+
+		guard let collectionView = collectionView else { return }
+
+		if !attributesCache.isEmpty {
+			attributesCache.removeAll(keepingCapacity: true)
+		}
+
+		let numberOfColumns = delegate.numberOfColumns()
+
+		var offsetY = Array<CGFloat>(repeating: 0.0, count: numberOfColumns)
+
+		let itemWidth = collectionView.bounds.width / CGFloat(numberOfColumns) - CGFloat(numberOfColumns - 1)*(itemSpacing) / CGFloat(numberOfColumns)
+
+		var column = 0
+		for item in 0..<collectionView.numberOfItems(inSection: 0)
+		{
+			let itemX = CGFloat(column) * (itemWidth + itemSpacing)
+			let itemY = offsetY[column]
+
+			let indexPath = IndexPath(item: item, section: 0)
+			let itemHeight = delegate.heightForItem(at: indexPath, itemWidth: itemWidth)
+
+			let frame = CGRect(x: itemX, y: itemY, width: itemWidth, height: itemHeight)
+
+			let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+			attributes.frame = frame
+			attributesCache.append(attributes)
+
+			offsetY[column] += (itemHeight + itemSpacing)
+
+			column = (column < numberOfColumns - 1) ? (column + 1) : 0
+		}
+
+		contentHeight = offsetY.max()! - itemSpacing
+	}
+
+	override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]?
+	{
+		var visibleLayoutAttributes = [UICollectionViewLayoutAttributes]()
+
+		for attributes in attributesCache
+		{
+			if attributes.frame.intersects(rect) {
+				visibleLayoutAttributes.append(attributes)
+			}
+		}
+
+		return visibleLayoutAttributes
+	}
+
+	override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes?
+	{
+		return attributesCache[indexPath.item]
+	}
 }

@@ -25,7 +25,7 @@ class NetworkManager
 	private let kBaseUrl = "http://coub.com/api/v2"
 	let pageSize = 25
 
-	var currentPage = 0
+	var currentPage = 1
 
 	func fetchNextPage(completion: @escaping (Array<Item>?) -> Void)
 	{
@@ -36,12 +36,12 @@ class NetworkManager
 
 	func resetPageCounter()
 	{
-		currentPage = 0
+		currentPage = 1
 	}
-	
+
 	func isInitialPage() -> Bool
 	{
-		return currentPage == 0
+		return currentPage == 1
 	}
 	
 	// MARK: - Private methods
@@ -68,13 +68,15 @@ class NetworkManager
 					completion(nil)
 					return
 				}
-				
+
 				var items = Array<Item>()
 
 				for itemJson in json["coubs"] as! [Dictionary<String, AnyObject>]
 				{
 					let imagePath = itemJson["picture"] as! String
 					let imageUrl = URL(string: imagePath)!
+					
+					print("\(items.count): \(itemJson["title"]!)")
 
 					let dimensions = itemJson["dimensions"] as! Dictionary<String, AnyObject>
 					let size = dimensions["med"] as! Array<Double>

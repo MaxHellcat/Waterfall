@@ -75,8 +75,6 @@ class NetworkManager
 				{
 					let imagePath = itemJson["picture"] as! String
 					let imageUrl = URL(string: imagePath)!
-					
-					print("\(items.count): \(itemJson["title"]!)")
 
 					let dimensions = itemJson["dimensions"] as! Dictionary<String, AnyObject>
 					let size = dimensions["med"] as! Array<Double>
